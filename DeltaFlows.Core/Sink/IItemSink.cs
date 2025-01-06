@@ -8,4 +8,11 @@ namespace DeltaFlows.Core.Sink
 
         IDeltaGate DeltaGate { get; set; }
     }
+
+    public class ItemSink : IItemSink
+    {
+        public string ItemType { get; set; }
+
+        public IDeltaGate DeltaGate { get; set; }
+    }
 }

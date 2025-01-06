@@ -1,40 +1,70 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DeltaFlows.Core.Delta;
+using DeltaFlows.Core.Item;
+using DeltaFlows.Core.Sink;
+using DeltaFlows.Core.Source;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DeltaFlows.Core
 {
     public static class RegistrationExtensions
     {
         public static IServiceCollection AddDeltaFlows(this IServiceCollection services,
-            Action<IDeltaFlowsBuilder> configurer)
+            Action<IDeltaFlowBuilder> configurer)
         {
-            //services.AddSingleton<IHasher, MD5Hasher>();
-
-            var builder = new DeltaFlowsBuilder(services);
+            var builder = new DeltaFlowBuilder(services);
             configurer(builder);
-            // builder.Build();
+
+            builder.Build();
 
             return services;
         }
     }
 
-    internal class DeltaFlowsBuilder : IDeltaFlowsBuilder
+    public class DeltaFlowBuilder : IDeltaFlowBuilder
     {
-        public DeltaFlowsBuilder(IServiceCollection services)
+        private readonly IFlow _flow = new Flow("default");
+
+        public DeltaFlowBuilder(IServiceCollection services)
         {
             Services = services;
         }
 
         public IServiceCollection Services { get; }
 
-        public void Add(string name)
+        public IDeltaFlowBuilder AddSink(IItemSink sink)
         {
-            Services.AddSingleton<IFlow, Flow>(sp => new Flow(name));
+            if (_flow.Sinks?.Any() != true)
+            {
+                _flow.Sinks = new List<IItemSink>();
+            }
+
+            _flow.Sinks.Add(sink);
+            return this;
+        }
+
+        public IDeltaFlowBuilder AddSource(string itemType, IItemAnalyzer itemAnalyzer, IDeltaGate deltaGate)
+        {
+            var itemSource = new ItemSource(itemType, itemAnalyzer, deltaGate);
+            _flow.Source = itemSource;
+
+            return this;
+        }
+
+        public void Build()
+        {
+            Services.AddSingleton<IFlow>(_flow);
         }
     }
 
-    public interface IDeltaFlowsBuilder
+    public interface IDeltaFlowBuilder
     {
-        void Add(string name);
+        IDeltaFlowBuilder AddSource(string itemType, IItemAnalyzer itemAnalyzer, IDeltaGate deltaGate);
+
+        IDeltaFlowBuilder AddSink(IItemSink sink);
+
+        void Build();
     }
 }

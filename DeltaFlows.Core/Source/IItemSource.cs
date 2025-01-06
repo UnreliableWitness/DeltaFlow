@@ -11,4 +11,20 @@ namespace DeltaFlows.Core.Source
 
         IItemAnalyzer ItemAnalyzer { get; set; }
     }
+
+    public class ItemSource : IItemSource
+    {
+        public string ItemType { get; set; }
+
+        public IDeltaGate DeltaGate { get; set; }
+
+        public IItemAnalyzer ItemAnalyzer { get; set; }
+
+        public ItemSource(string itemType, IItemAnalyzer itemAnalyzer, IDeltaGate deltaGate)
+        {
+            ItemType = itemType;
+            ItemAnalyzer = itemAnalyzer;
+            DeltaGate = deltaGate;
+        }
+    }
 }

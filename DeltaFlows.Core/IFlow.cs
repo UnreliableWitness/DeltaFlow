@@ -10,7 +10,7 @@ namespace DeltaFlows.Core
 
         IItemSource Source { get; set; }
 
-        IReadOnlyCollection<IItemSink> Sinks { get; set; }
+        ICollection<IItemSink> Sinks { get; set; }
     }
 
     public class Flow : IFlow
@@ -22,7 +22,8 @@ namespace DeltaFlows.Core
             Name = name;
         }
 
-        public IItemSource Source { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public IReadOnlyCollection<IItemSink> Sinks { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public IItemSource Source { get; set; }
+
+        public ICollection<IItemSink> Sinks { get; set; }
     }
 }
